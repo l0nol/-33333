@@ -1417,33 +1417,31 @@ const JewelTreeScene: React.FC<JewelTreeSceneProps> = ({
                 targetScale = 3.5;
                 group.lookAt(camera.position); 
 
-                // Optimize visibility for close-up:
-                // 1. Remove photo self-illumination (or very low) to ensure clarity without whitewash
+                // ZOOM MODE: Turn off emissive glow completely for clarity
                 if (photoMesh && photoMesh.material instanceof THREE.MeshStandardMaterial) {
-                     photoMesh.material.emissiveIntensity = 0.0; 
-                     photoMesh.material.roughness = 1.0; // Max roughness to prevent any glare
-                     photoMesh.material.metalness = 0.0;
+                     photoMesh.material.emissiveIntensity = 0.0; // NO GLOW
+                     photoMesh.material.roughness = 0.8; // Reduce reflection
                 }
-                // 2. Faint border glow
+                // Optional: Keep frame glow low or off. I'll keep it low to define the edge.
                 if (frameMesh && frameMesh.material instanceof THREE.MeshStandardMaterial) {
                      frameMesh.material.emissive.setHex(0xFFD700);
-                     frameMesh.material.emissiveIntensity = 0.3; // Faint glow (was 3.0)
+                     frameMesh.material.emissiveIntensity = 0.2; 
                 }
 
             } else {
+                // ... positioning ...
                 if (state === AppState.SCATTER) {
                     targetScale = 2.0; 
                     group.lookAt(camera.position);
                     targetPos = group.userData.scatterPos;
                 } else {
                     targetPos = group.userData.treePos;
-                    // ... rotation logic ...
                     group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, group.userData.baseRot.x, 0.1);
                     group.rotation.y = group.userData.baseRot.y + timeRef.current * 0.5; 
                     group.rotation.z = THREE.MathUtils.lerp(group.rotation.z, group.userData.baseRot.z, 0.1);
                 }
 
-                // Restore default high visibility for distance
+                // NORMAL MODE: High glow for visibility
                 if (photoMesh && photoMesh.material instanceof THREE.MeshStandardMaterial) {
                      photoMesh.material.emissiveIntensity = 1.0;
                      photoMesh.material.roughness = 0.2;
